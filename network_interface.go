@@ -38,6 +38,7 @@ func (nis *network_interfaces) add_network_interface(name string, ip string, dev
 	// subscribe to network
 	ni.rc, ni.sc = default_pubsub.subscribe(device.id(), network.String())
 	go ni.listen()
+	default_logger.infof("device %s subscribed to network %s", device.name(), network.String())
 
 	// save to network_interfaces
 	nis.m[name] = ni
@@ -56,13 +57,12 @@ func (nis *network_interfaces) get_interface(name string) (*network_interface, e
 // output_data sends data thought its wire, if any, otherwise returns an error
 func (ni *network_interface) output_data(data []byte) error {
 	if ni.sc == nil {
-		return fmt.Errorf("network interface [%s] %s is not attached to any wire\n", ni.name, ni.ip)
+		return fmt.Errorf("network interface [%s] %s is not attached to any wire", ni.name, ni.ip)
 	}
 
 	// send data
-	// ni.wire.buffer <- wire_data{ni.device.id(), data}
 	ni.sc(data)
-	fmt.Printf("interface %s [%s] sent data\n", ni.name, ni.ip)
+	default_logger.infof("interface %s [%s] sent data", ni.name, ni.ip)
 	return nil
 }
 
@@ -75,14 +75,14 @@ func (ni *network_interface) listen() {
 			break
 		}
 
-		fmt.Printf("interface %s [%s] read packet\n", ni.name, ni.ip)
-
 		// parse packet
 		packet := parse_packet(data)
 		if packet == nil {
 			fmt.Println("invalid packet format, frame dropped", data)
 			continue
 		}
+
+		default_logger.infof("interface %s [%s] read packet with destination: %s", ni.name, ni.ip, packet.destination)
 
 		// let the device handle the packet
 		ni.device.handle_packet(*packet, ni)

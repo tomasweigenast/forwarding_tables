@@ -11,4 +11,6 @@ type Device interface {
 	handle_packet(p packet, i *network_interface)
 
 	id() string
+
+	name() string
 }
