@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
+	defer default_pubsub.close()
+
 	routerA := new_router("routerA")
 	routerB := new_router("routerB")
 	host1 := new_host("host1")
