@@ -9,6 +9,7 @@ type Router struct {
 	ftable     ftable
 	interfaces network_interfaces
 	name       string
+	_id        string
 }
 
 func (r *Router) send(ip net.IP, data []byte) error {
@@ -41,11 +42,16 @@ func new_router(name string) *Router {
 		ftable:     newftable(),
 		interfaces: new_network_interfaces(),
 		name:       name,
+		_id:        random_id(),
 	}
 }
 
 func (r *Router) add_interface(name string, ip string) {
 	r.interfaces.add_network_interface(name, ip, r)
+}
+
+func (r *Router) id() string {
+	return r._id
 }
 
 func (r *Router) start() {

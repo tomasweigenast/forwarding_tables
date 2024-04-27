@@ -9,4 +9,6 @@ type Device interface {
 
 	// handle_packet handles a packet p that came from i
 	handle_packet(p packet, i *network_interface)
+
+	id() string
 }

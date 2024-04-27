@@ -44,9 +44,9 @@ func (nis *network_interfaces) add_network_interface(name string, ip string, dev
 }
 
 // attach_interface_to attaches this network interface to the wire w and start listening for incoming data
-func (nis *network_interface) attach_interface_to(w *Wire) {
-	nis.wire = w
-	go nis.listen()
+func (ni *network_interface) attach_interface_to(w *Wire) {
+	ni.wire = w
+	go ni.listen()
 }
 
 func (nis *network_interfaces) get_interface(name string) (*network_interface, error) {
@@ -64,23 +64,31 @@ func (ni *network_interface) output_data(data []byte) error {
 	}
 
 	// send data
-	ni.wire.buffer <- data
+	ni.wire.buffer <- wire_data{ni.device.id(), data}
+	fmt.Printf("interface %s [%s] sent data\n", ni.name, ni.ip)
 	return nil
 }
 
 func (ni *network_interface) listen() {
 	for {
-		// wait for data
-		data, ok := <-ni.wire.buffer
+		// wait for wire_data
+		wire_data, ok := <-ni.wire.buffer
 		if !ok {
-			fmt.Printf("wire channel is closed\n")
+			fmt.Println("wire channel is closed")
 			break
 		}
 
+		// skip this read because this is the packet this interface sent
+		if wire_data.initiator == ni.device.id() {
+			continue
+		}
+
+		fmt.Printf("interface %s [%s] read packet\n", ni.name, ni.ip)
+
 		// parse packet
-		packet := parse_packet(data)
+		packet := parse_packet(wire_data.data)
 		if packet == nil {
-			fmt.Println("invalid packet format, frame dropped", data)
+			fmt.Println("invalid packet format, frame dropped", wire_data)
 			continue
 		}
 

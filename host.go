@@ -9,6 +9,7 @@ type Host struct {
 	ftable     ftable
 	interfaces network_interfaces
 	name       string
+	_id        string
 }
 
 func new_host(name string) *Host {
@@ -16,6 +17,7 @@ func new_host(name string) *Host {
 		ftable:     newftable(),
 		name:       name,
 		interfaces: new_network_interfaces(),
+		_id:        random_id(),
 	}
 }
 
@@ -35,6 +37,10 @@ func (r *Host) send(ip net.IP, data []byte) error {
 	packet := new_packet(interf.ip, ip, data)
 
 	return interf.output_data(packet.encode())
+}
+
+func (r *Host) id() string {
+	return r._id
 }
 
 func (r *Host) add_interface(name string, ip string) {
