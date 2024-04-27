@@ -29,9 +29,9 @@ func (l *logger) close() {
 }
 
 func (l *logger) log(level int, text string) {
-	l.f.Write([]byte(text))
+	fmt.Println(text)
 	if level == 5 {
-		fmt.Println(text + endline)
+		l.f.Write([]byte(text + endline))
 	}
 }
 

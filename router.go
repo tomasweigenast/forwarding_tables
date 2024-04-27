@@ -2,6 +2,8 @@ package main
 
 import (
 	"net"
+
+	"tomasweigenast.com/forwarding_tables/packets"
 )
 
 type Router struct {
@@ -11,7 +13,7 @@ type Router struct {
 	_id        string
 }
 
-func (r *Router) send(ip net.IP, data []byte) error {
+func (r *Router) send(ip net.IP, data packets.IPv4Payload) error {
 	packet := new_packet(nil, ip, data)
 	return r.forward_packet(ip, packet)
 }
@@ -45,7 +47,7 @@ func new_router(name string) *Router {
 		ftable:     newftable(),
 		interfaces: new_network_interfaces(),
 		_name:      name,
-		_id:        random_id(),
+		_id:        name, //random_id(),
 	}
 }
 
@@ -66,6 +68,7 @@ func (r *Router) handle_packet(p packet, i *network_interface) {
 	if p.destination.Equal(i.ip) {
 		dataString := string(p.data)
 		default_logger.file_logf("router %s [%s: %s] received packet from %s: %s", r._name, i.name, i.ip, p.sender, dataString)
+		handle_packet_payload(r, &p)
 		return
 	}
 
@@ -74,6 +77,6 @@ func (r *Router) handle_packet(p packet, i *network_interface) {
 	if err != nil {
 		default_logger.infof("an error occurred trying to forward a packet to %s: %s", p.destination, err)
 	} else {
-		default_logger.file_logf("jump from %s [%s] to %s", r._name, i.ip, p.destination)
+		default_logger.file_logf("jumped from %s [%s] to %s", r._name, i.ip, p.destination)
 	}
 }

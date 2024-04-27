@@ -2,6 +2,8 @@ package main
 
 import (
 	"net"
+
+	"tomasweigenast.com/forwarding_tables/packets"
 )
 
 type Host struct {
@@ -24,7 +26,7 @@ func (h *Host) name() string {
 	return h._name
 }
 
-func (h *Host) send(ip net.IP, data []byte) error {
+func (h *Host) send(ip net.IP, data packets.IPv4Payload) error {
 	// lookup in table
 	next_hop, name := h.ftable.lookup(ip)
 	if next_hop == nil {
@@ -59,4 +61,5 @@ func (r *Host) handle_packet(p packet, i *network_interface) {
 
 	dataString := string(p.data)
 	default_logger.infof("network interface %s [%s] received packet from %s: %s", i.name, i.ip, p.sender, dataString)
+	handle_packet_payload(r, &p)
 }
