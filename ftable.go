@@ -68,14 +68,14 @@ func parseSubnetMask(maskStr string) net.IPMask {
 	return mask
 }
 
-func (f *ftable) lookup(ip net.IP) (next_hop net.IP, interface_name string) {
+func (f *ftable) lookup(ip net.IP) (next_hop net.IP, interface_name string, err error) {
 	for _, entry := range *f {
 		if entry.dst.Contains(ip) {
-			return entry.nhop, entry.intf
+			return entry.nhop, entry.intf, nil
 		}
 	}
 
-	return nil, ""
+	return nil, "", ErrNoNextHop
 }
 
 func (ftable *ftable) add(destination, nextHop, interfaceName string) {

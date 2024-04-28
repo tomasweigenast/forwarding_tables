@@ -28,9 +28,9 @@ func (h *Host) name() string {
 
 func (h *Host) send(ip net.IP, data packets.IPv4Payload) error {
 	// lookup in table
-	next_hop, name := h.ftable.lookup(ip)
-	if next_hop == nil {
-		default_logger.infof("forwarding error on device %q trying to send to %q", h._name, ip)
+	_, name, err := h.ftable.lookup(ip)
+	if err != nil {
+		default_logger.infof("forwarding error on device %q trying to send to %q: %s", h._name, ip, err)
 		return ErrForwardingError
 	}
 
@@ -40,7 +40,11 @@ func (h *Host) send(ip net.IP, data packets.IPv4Payload) error {
 	}
 
 	packet := new_packet(interf.ip, ip, data)
-	default_logger.file_logf("host %s [%s] sending data to %s", h._name, interf.ip, ip)
+	packet.id = random_packet_id()
+	default_logger.file_logf("host %s [%s] sending data to %s [packet id: %d]", h._name, interf.ip, ip, packet.id)
+
+	// start recording
+	default_network_recorder.new_recording(packet.id)
 
 	return interf.output_data(packet.encode())
 }
@@ -62,4 +66,11 @@ func (r *Host) handle_packet(p packet, i *network_interface) {
 	dataString := string(p.data)
 	default_logger.infof("network interface %s [%s] received packet from %s: %s", i.name, i.ip, p.sender, dataString)
 	handle_packet_payload(r, &p)
+
+	// if this is the end, stop recording
+	default_logger.infof("jumps done ---------------------")
+	for _, jump := range default_network_recorder.get_jumps(p.id) {
+		default_logger.infof("from %q to %q", jump.source, jump.destination)
+	}
+	default_logger.infof("------------------------------------------")
 }

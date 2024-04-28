@@ -13,3 +13,12 @@ func random_id() string {
 
 	return hex.EncodeToString(b)
 }
+
+func random_packet_id() byte {
+	b := make([]byte, 1)
+	if _, err := rand.Read(b); err != nil {
+		panic(err)
+	}
+
+	return b[0]
+}

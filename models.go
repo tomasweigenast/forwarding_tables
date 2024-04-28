@@ -1,6 +1,8 @@
 package main
 
-type JsonFile []DeviceDefinition
+type DataFile struct {
+	Devices []DeviceDefinition `yaml:"devices"`
+}
 
 type DeviceType string
 
@@ -10,14 +12,8 @@ const (
 )
 
 type DeviceDefinition struct {
-	DeviceName string                 `json:"name"`
-	DeviceType DeviceType             `json:"type"`
-	Interfaces map[string]string      `json:"interfaces"`
-	Table      []ForwardingTableEntry `json:"table"`
-}
-
-type ForwardingTableEntry struct {
-	Destination string `json:"destination"`
-	NextHop     string `json:"next_hop"`
-	Interface   string `json:"interface"`
+	DeviceName string            `yaml:"name"`
+	DeviceType DeviceType        `yaml:"type"`
+	Interfaces map[string]string `yaml:"interfaces"`
+	Table      []string          `yaml:"forwarding_table"`
 }

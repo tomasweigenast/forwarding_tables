@@ -15,9 +15,10 @@ type packet struct {
 	protocol    packets.IPv4Protocol
 	data        []byte
 	len         int64
+	id          byte
 }
 
-const ipv4_packet_base_size = 4 + 4 + 1 + 8
+const ipv4_packet_base_size = 4 + 4 + 1 + 8 + /* id */ 1
 
 func new_packet(sender net.IP, destination net.IP, payload packets.IPv4Payload) *packet {
 	sender = sender.To4()
@@ -44,14 +45,16 @@ func parse_packet(buffer []byte) *packet {
 	sender_ip := net.IP(buffer[0:4])
 	dest_ip := net.IP(buffer[4:8])
 	protocol := buffer[8]
-	dataLen := int64(binary.LittleEndian.Uint64(buffer[9:17]))
-	data := buffer[17:]
+	id := buffer[9]
+	dataLen := int64(binary.LittleEndian.Uint64(buffer[10:18]))
+	data := buffer[18:]
 	return &packet{
 		sender:      sender_ip,
 		destination: dest_ip,
 		protocol:    packets.IPv4Protocol(protocol),
 		len:         dataLen,
 		data:        data,
+		id:          id,
 	}
 }
 
@@ -67,8 +70,9 @@ func (p *packet) encode() []byte {
 	copy(buffer[0:], p.sender)
 	copy(buffer[4:], p.destination)
 	buffer[8] = byte(p.protocol)
-	copy(buffer[9:], lenBytes[:])
-	copy(buffer[17:], p.data)
+	buffer[9] = p.id
+	copy(buffer[10:], lenBytes[:])
+	copy(buffer[18:], p.data)
 
 	return buffer
 }

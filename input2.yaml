@@ -1,0 +1,110 @@
+devices:
+  - name: routerA
+    type: r
+    interfaces:
+      ra_int1: 10.192.0.1/10
+      ra_int2: 10.0.0.1/30
+      ra_int3: 10.0.0.5/30
+    forwarding_table:
+      - "10.192.0.0/10 > ra_int1"
+      - "10.0.0.0/30 > ra_int2"
+      - "10.0.0.4/30 > ra_int3"
+      - "10.128.0.0/10 > 10.0.0.6:ra_int3"
+      - "10.0.0.20/30 > 10.0.0.6:ra_int3"
+      - "10.0.0.8/30 > 10.0.0.6:ra_int3"
+      - "10.0.0.12/30 > 10.0.0.2:ra_int2"
+      - "10.0.0.16/30 > 10.0.0.2:ra_int2"
+      - "0.0.0.0/0 > 10.0.0.6:ra_int3"
+
+  - name: routerB
+    type: r
+    interfaces:
+      rb_int1: 10.0.0.2/30
+      rb_int2: 10.0.0.13/30
+    forwarding_table:
+      - "10.0.0.0/30 > rb_int1"
+      - "10.0.0.12/30 > rb_int2"
+      - "10.192.0.0/10 > 10.0.0.1:rb_int1"
+      - "10.0.0.4/30 > 10.0.0.1:rb_int1"
+      - "10.0.0.20/30 > 10.0.0.1:rb_int1"
+      - "10.128.0.0/10 > 10.0.0.1:rb_int1"
+      - "10.0.0.8/10 > 10.0.0.14:rb_int2"
+      - "0.0.0.0/0 > 10.0.0.14:rb_int2"
+
+  - name: routerD
+    type: r
+    interfaces:
+      rd_int1: 10.0.0.14/30
+      rd_int2: 10.0.0.10/30
+      rd_int3: 10.0.0.17/30
+    forwarding_table:
+      - "10.0.0.12/30 > rd_int1"
+      - "10.0.0.8/30 > rd_int2"
+      - "10.0.0.16/30 > rd_int3"
+      - "190.1.1.1/30 > 10.0.0.18:rd_int3"
+      - "10.0.0.20/30 > 10.0.0.9:rd_int2"
+      - "10.128.0.0/10 > 10.0.0.9:rd_int2"
+      - "10.0.0.4/30 > 10.0.0.9:rd_int2"
+      - "10.192.0.0/10 > 10.0.0.9:rd_int2"
+      - "10.0.0.0/30 > 10.0.0.13:rd_int1"
+
+  - name: routerE
+    type: r
+    interfaces:
+      re_int1: 10.0.0.18/30
+      re_int2: 192.1.1.2/30
+    forwarding_table:
+      - "10.0.0.16/30 > re_int1"
+      - "190.1.1.0/30 > re_int2"
+      - "0.0.0.0/30 > 10.0.0.17:re_int1"
+
+  - name: routerC
+    type: r
+    interfaces:
+      rc_int1: 10.0.0.9/30
+      rc_int2: 10.0.0.6/30
+      rc_int3: 10.0.0.21/30
+    forwarding_table:
+      - "10.0.0.4/30 > rc_int2"
+      - "10.0.0.20/30 > rc_int3"
+      - "10.0.0.8/30 > rc_int1"
+      - "10.192.0.0/10 > 10.0.0.5:rc_int2"
+      - "10.128.0.0/10 > 10.0.0.22:rc_int3"
+      - "10.0.0.0/30 > 10.0.0.5:rc_int2"
+      - "10.0.0.12/30 > 10.0.0.10:rc_int1"
+      - "0.0.0.0/0 > 10.0.0.10:rc_int1"
+
+  - name: routerF
+    type: r
+    interfaces:
+      rf_int1: 10.0.0.22/30
+      rf_int2: 10.128.0.1/10
+    forwarding_table:
+      - "10.0.0.20/30 > rf_int1"
+      - "10.128.0.0/10 > rf_int2"
+      - "10.192.0.0/10 > 10.0.0.21:rf_int1"
+      - "190.1.1.1/30 > 10.0.0.21:rf_int1"
+      - "10.0.0.0/30 > 10.0.0.21:rf_int1"
+      - "10.0.0.16/30 > 10.0.0.21:rf_int1"
+      - "0.0.0.0/0 > 10.0.0.21:rf_int1"
+
+  - name: host1
+    type: h
+    interfaces:
+      h1_int: 10.192.0.2/10
+    forwarding_table:
+      - "0.0.0.0/0 > h1_int"
+
+  - name: host2
+    type: h
+    interfaces:
+      h2_int: 10.128.0.2/10
+    forwarding_table:
+      - "0.0.0.0/0 > h2_int"
+
+  - name: cloud
+    type: h
+    interfaces:
+      c_int: 190.1.1.1/30
+    forwarding_table:
+      - "0.0.0.0/0 > c_int"
